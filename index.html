@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Study Hub</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+}
+
+header {
+    background: #173f5f;
+    color: white;
+    text-align: center;
+    padding: 35px 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.search {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+    color: #173f5f;
+}
+
+button {
+    background: #173f5f;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+#questions {
+    margin-top: 30px;
+}
+
+.timer {
+    background: #173f5f;
+    color: white;
+    padding: 18px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.question-box {
+    background: white;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.option {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    text-align: left;
+    background: white;
+    color: #222;
+    border: 1px solid #173f5f;
+}
+
+.option:disabled {
+    cursor: not-allowed;
+}
+
+.result {
+    font-weight: bold;
+}
+
+.score {
+    background: #173f5f;
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+footer {
+    margin-top: 40px;
+    background: #173f5f;
+    color: white;
+    text-align: center;
+    padding: 25px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎓 Student Study Hub</h1>
+    <p>Study smarter. Prepare better. Pass with confidence.</p>
+</header>
+
+<div class="container">
+
+<input
+    class="search"
+    type="text"
+    placeholder="🔍 Search for a course..."
+>
+
+<h2>📚 Study Materials</h2>
+
+<div class="cards">
+
+<div class="card">
+    <h3>📝 Hard STA Questions</h3>
+    <p>Take a difficult Statistics practice test.</p>
+    <button onclick="showQuestions()">Start Test</button>
+</div>
+
+<div class="card">
+    <h3>📖 Study Notes</h3>
+    <p>Review important Statistics concepts.</p>
+    <button onclick="showNotes()">View Notes</button>
+</div>
+
+<div class="card">
+    <h3>🧠 Quick Quiz</h3>
+    <p>Test your Statistics knowledge.</p>
+    <button onclick="startQuiz()">Take Quiz</button>
+</div>
+
+<div class="card">
+    <h3>🎯 Exam Revision</h3>
+    <p>Review important examination topics.</p>
+    <button onclick="startRevision()">Start Revision</button>
+</div>
+
+<div class="card">
+    <h3>⭐ Premium Study Packs</h3>
+    <p>Advanced study materials coming soon.</p>
+    <button onclick="showPremium()">View Premium</button>
+</div>
+
+<div class="card">
+    <h3>📅 Study Planner</h3>
+    <p>Organize your study time.</p>
+    <button onclick="openPlanner()">Open Planner</button>
+</div>
+
+</div>
+
+<div id="questions"></div>
+
+</div>
+
+<footer>
+© 2026 Student Study Hub
+</footer>
+
+<script>
+
+let score = 0;
+let answered = 0;
+let timeLeft = 1800;
+let timerInterval;
+
+const questions = [
+
+{
+question: "If X has mean 10 and variance 16, and Y = 3X − 5, what are the mean and variance of Y?",
+options: [
+"Mean = 25, Variance = 48",
+"Mean = 25, Variance = 144",
+"Mean = 35, Variance = 144",
+"Mean = 30, Variance = 16"
+],
+answer: 1
+},
+
+{
+question: "A dataset has variance 25. If every observation is multiplied by 4, what is the new variance?",
+options: [
+"100",
+"200",
+"400",
+"625"
+],
+answer: 2
+},
+
+{
+question: "If P(A) = 0.6, P(B) = 0.5 and P(A ∩ B) = 0.2, what is P(A ∪ B)?",
+options: [
+"0.7",
+"0.8",
+"0.9",
+"1.1"
+],
+answer: 2
+},
+
+{
+question: "A population has mean 50 and standard deviation 12. If a value is 74, what is its z-score?",
+options: [
+"1.5",
+"2",
+"2.5",
+"3"
+],
+answer: 1
+},
+
+{
+question: "The mean of five observations is 12. Four observations are 8, 10, 14 and 16. What is the fifth observation?",
+options: [
+"10",
+"12",
+"14",
+"16"
+],
+answer: 1
+},
+
+{
+question: "If two events A and B are independent, P(A)=0.4 and P(B)=0.3. What is P(A ∩ B)?",
+options: [
+"0.1",
+"0.12",
+"0.7",
+"1.2"
+],
+answer: 1
+},
+
+{
+question: "A normal distribution has mean 100 and standard deviation 15. Approximately what percentage of observations lie within one standard deviation of the mean?",
+options: [
+"50%",
+"68%",
+"95%",
+"99.7%"
+],
+answer: 1
+},
+
+{
+question: "If the correlation coefficient between X and Y is −0.85, what does this indicate?",
+options: [
+"Strong positive relationship",
+"Weak positive relationship",
+"Strong negative relationship",
+"No relationship"
+],
+answer: 2
+},
+
+{
+question: "A population has values 2, 4, 6, 8 and 10. What is the population variance?",
+options: [
+"4",
+"6.8",
+"8",
+"10"
+],
+answer: 1
+},
+
+{
+question: "If the probability of an event occurring is 0.35, what is the probability that the event does NOT occur?",
+options: [
+"0.35",
+"0.55",
+"0.65",
+"1.35"
+],
+answer: 2
+}
+
+];
+
+
+function showQuestions() {
+
+score = 0;
+answered = 0;
+timeLeft = 1800;
+
+clearInterval(timerInterval);
+
+let html = `
+
+<div class="timer">
+⏱️ Time Left: <span id="timer">30:00</span>
+</div>
+
+<div class="score">
+<h2 style="color:white;">🔥 HARD STA PRACTICE TEST</h2>
+<p>10 difficult Statistics questions</p>
+<p>⏱️ You have 30 minutes.</p>
+</div>
+
+`;
+
+questions.forEach((q, index) => {
+
+html += `
+
+<div class="question-box">
+
+<h3>Question ${index + 1}</h3>
+
+<p>
+<strong>${q.question}</strong>
+</p>
+
+`;
+
+q.options.forEach((option, optionIndex) => {
+
+html += `
+
+<button
+class="option"
+onclick="checkAnswer(${index}, ${optionIndex}, this)"
+>
+${String.fromCharCode(65 + optionIndex)}. ${option}
+</button>
+
+`;
+
+});
+
+html += `
+
+<p id="result-${index}" class="result"></p>
+
+</div>
+
+`;
+
+});
+
+html += `
+
+<div class="score">
+
+<h2 style="color:white;">📊 Final Result</h2>
+
+<p id="finalScore">
+Complete the test to see your grade.
+</p>
+
+</div>
+
+`;
+
+document.getElementById("questions").innerHTML = html;
+
+document.getElementById("questions").scrollIntoView({
+behavior: "smooth"
+});
+
+startTimer();
+
+}
+
+
+function startTimer() {
+
+timerInterval = setInterval(function() {
+
+timeLeft--;
+
+let minutes = Math.floor(timeLeft / 60);
+let seconds = timeLeft % 60;
+
+if (seconds < 10) {
+seconds = "0" + seconds;
+}
+
+document.getElementById("timer").innerHTML =
+minutes + ":" + seconds;
+
+if (timeLeft <= 0) {
+
+clearInterval(timerInterval);
+
+finishTest();
+
+}
+
+}, 1000);
+
+}
+
+
+function checkAnswer(questionIndex, selectedAnswer, button) {
+
+const result =
+document.getElementById("result-" + questionIndex);
+
+if (result.innerHTML !== "") {
+return;
+}
+
+answered++;
+
+const buttons =
+button.parentElement.querySelectorAll(".option");
+
+buttons.forEach(btn => {
+btn.disabled = true;
+});
+
+if (selectedAnswer === questions[questionIndex].answer) {
+
+score++;
+
+result.innerHTML = "✅ Correct!";
+
+} else {
+
+const correct =
+questions[questionIndex].answer;
+
+result.innerHTML =
+"❌ Wrong! Correct answer: " +
+String.fromCharCode(65 + correct) +
+". " +
+questions[questionIndex].options[correct];
+
+}
+
+if (answered === questions.length) {
+finishTest();
+}
+
+}
+
+
+function finishTest() {
+
+clearInterval(timerInterval);
+
+let percentage =
+(score / questions.length) * 100;
+
+let grade;
+
+if (percentage >= 80) {
+grade = "A";
+}
+else if (percentage >= 70) {
+grade = "B";
+}
+else if (percentage >= 60) {
+grade = "C";
+}
+else if (percentage >= 50) {
+grade = "D";
+}
+else {
+grade = "F";
+}
+
+document.getElementById("finalScore").innerHTML =
+
+"Score: <strong>" + score + " / 10</strong><br><br>" +
+
+"Percentage: <strong>" + percentage + "%</strong><br><br>" +
+
+"Grade: <strong>" + grade + "</strong>";
+
+document.querySelectorAll(".option").forEach(btn => {
+btn.disabled = true;
+});
+
+document.querySelector(".score:last-child").scrollIntoView({
+behavior: "smooth"
+});
+
+}
+
+
+function showNotes() {
+
+alert(
+"📚 STATISTICS NOTES\n\n" +
+"Mean = Sum of observations ÷ Number of observations\n\n" +
+"Variance measures how spread out observations are.\n\n" +
+"Standard deviation = √Variance\n\n" +
+"Important formula:\n" +
+"Var(aX + b) = a² Var(X)"
+);
+
+}
+
+
+function startQuiz() {
+
+alert(
+"🧠 QUICK QUIZ\n\n" +
+"What is the mean of 2, 4 and 6?\n\n" +
+"Answer: 4"
+);
+
+}
+
+
+function startRevision() {
+
+alert(
+"🎯 EXAM REVISION\n\n" +
+"Revise:\n\n" +
+"• Mean\n" +
+"• Variance\n" +
+"• Standard deviation\n" +
+"• Probability\n" +
+"• Normal distribution\n" +
+"• Z-scores\n" +
+"• Correlation"
+);
+
+}
+
+
+function showPremium() {
+
+alert(
+"⭐ PREMIUM STUDY PACKS\n\n" +
+"Advanced study materials coming soon."
+);
+
+}
+
+
+function openPlanner() {
+
+alert(
+"📅 STUDY PLANNER\n\n" +
+"Monday: Probability\n" +
+"Tuesday: Mean & Variance\n" +
+"Wednesday: Normal Distribution\n" +
+"Thursday: Correlation\n" +
+"Friday: Practice Test"
+);
+
+}
+
+</script>
+
+</body>
+</html>
